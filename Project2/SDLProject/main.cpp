@@ -15,22 +15,30 @@ using namespace std;
 #include "ShaderProgram.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include <cstdlib>
+#include <stdlib.h>
 
 
 SDL_Window* displayWindow;
 bool gameIsRunning = true;
-ShaderProgram program;
-glm::mat4 viewMatrix, playerMatrix, projectionMatrix, rectMatrix;
+ShaderProgram program, programTexture;
+glm::mat4 viewMatrix, paddleLeftMatrix, paddleRightMatrix, ballMatrix, projectionMatrix;
 
-glm::vec3 playerPosition = glm::vec3(0, 0, 0);
-glm::vec3 playerMovement = glm::vec3(0, 0, 0);
-float playerSpeed = 1.0f;
-GLuint playerTextureID;
+glm::vec3 paddleLeftPosition = glm::vec3(-4.6f, 0, 0);
+glm::vec3 paddleLeftMovement = glm::vec3(0, 0, 0);
+glm::vec3 paddleRightPosition = glm::vec3(4.6f, 0, 0);
+glm::vec3 paddleRightMovement = glm::vec3(0, 0, 0);
+glm::vec3 ballPosition = glm::vec3(0, 0, 0);
+glm::vec3 ballMovement = glm::vec3(0, 0, 0);
+float paddleSpeed = 2.0f;
 
 int windowHeight = 480;
 int windowWidth = 640;
 float orthoHeight = 5.0f;
 float orthoWidth = 3.75f;
+
+bool gameStarted = false;
+bool gameOver = false;
 
 GLuint loadTexture(const char* filePath) {
     int w, h, n;
@@ -41,7 +49,8 @@ GLuint loadTexture(const char* filePath) {
         assert(false);
     }
     
-    GLuint textureID;glGenTextures(1, &textureID);
+    GLuint textureID;
+    glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -56,29 +65,29 @@ void init() {
     displayWindow = SDL_CreateWindow("Project 2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
     SDL_GL_MakeCurrent(displayWindow, context);
-    
+
 #ifdef _WINDOWS
     glewInit();
 #endif
     glViewport(0, 0, windowWidth, windowHeight);
-    
-    program.Load("shaders/vertex_textured.glsl", "shaders/fragment_textured.glsl");
-    
-    playerMatrix = glm::mat4(1.0f);
-    rectMatrix = glm::mat4(1.0f);
+
+    program.Load("shaders/vertex.glsl", "shaders/fragment.glsl");
+
+    paddleLeftMatrix = glm::mat4(1.0f);
+    paddleRightMatrix = glm::mat4(1.0f);
+    ballMatrix = glm::mat4(1.0f);
     viewMatrix = glm::mat4(1.0f);
     projectionMatrix = glm::ortho(-orthoHeight, orthoHeight, -orthoWidth, orthoWidth, -1.0f, 1.0f);
-    
+
     program.SetProjectionMatrix(projectionMatrix);
     program.SetViewMatrix(viewMatrix);
-    
-    glUseProgram(program.programID);
-    
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    
-    playerTextureID = loadTexture("ctg.png");
 
-    
+    program.SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+    glUseProgram(program.programID);
+
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
@@ -90,7 +99,8 @@ void shutdown() {
 
 void processInput() {
     
-    playerMovement = glm::vec3(0, 0, 0);
+    paddleLeftMovement = glm::vec3(0, 0, 0);
+    paddleRightMovement = glm::vec3(0, 0, 0);
     
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -106,6 +116,11 @@ void processInput() {
                     case SDLK_LEFT:
                         break;
                     case SDLK_SPACE:
+                        if (!gameStarted) {
+                            ballMovement.x = 1;//(rand() % 4) - 2;
+                            ballMovement.y = 1;//(rand() % 4) - 2;
+                            gameStarted = true;
+                        }
                         break;
                 }
                 break;
@@ -114,65 +129,123 @@ void processInput() {
     
     const Uint8* keys = SDL_GetKeyboardState(NULL);
     
-    if (keys[SDL_SCANCODE_LEFT]) {
-        playerMovement.x = -1.0f;
+    if (keys[SDL_SCANCODE_W]) {
+        paddleLeftMovement.y = 1.0f;
         
-    } else if (keys[SDL_SCANCODE_RIGHT]) {
-        playerMovement.x = 1.0f;
+    } else if (keys[SDL_SCANCODE_S]) {
+        paddleLeftMovement.y = -1.0f;
     }
     
     if (keys[SDL_SCANCODE_DOWN]) {
-        playerMovement.y = -1.0f;
+        paddleRightMovement.y = -1.0f;
         
     } else if (keys[SDL_SCANCODE_UP]) {
-        playerMovement.y = 1.0f;
+        paddleRightMovement.y = 1.0f;
     }
     
-    if (glm::length(playerMovement) > 1.0f) {
-        playerMovement = glm::normalize(playerMovement);
+    if (glm::length(paddleRightMovement) > 1.0f) {
+        paddleRightMovement = glm::normalize(paddleRightMovement);
     }
     
+    if (glm::length(paddleLeftMovement) > 1.0f) {
+        paddleLeftMovement = glm::normalize(paddleLeftMovement);
+    }
+    
+}
+
+bool detectCollision(glm::vec3 ball, glm::vec3 paddle) {
+    
+    float ballWidth = 0.4;
+    float ballHeight = 0.4;
+    
+    float paddleWidth = 0.6;
+    float paddleHeight = 2.0;
+    
+    float xDiff = abs(ball.x - paddle.x);
+    float yDiff = abs(ball.y - paddle.y);
+    
+    float xDistance = xDiff - (ballWidth + paddleWidth)/2;
+    float yDistance = yDiff - (ballHeight + paddleHeight)/2;
+    
+    if (xDistance < 0 && yDistance < 0) return true;
+    
+    return false;
 }
 
 float lastTicks = 0.0f;
 
 void update() {
-    float ticks = (float)SDL_GetTicks() / 1000.0f;
-    float deltaTime = ticks - lastTicks;
-    lastTicks = ticks;
+    if (!gameOver) {
+        
+        float ticks = (float)SDL_GetTicks() / 1000.0f;
+        float deltaTime = ticks - lastTicks;
+        lastTicks = ticks;
+        
+        if(ballPosition.x >= 4.75f || ballPosition.x <= -4.75f) {
+            gameOver = true;
+        } else if (ballPosition.y >= 3.5 || ballPosition.y <= -3.5) {
+            ballMovement.y *= -1;
+        }
+        
+        if (detectCollision(ballPosition, paddleLeftPosition)) {
+            ballMovement.x *= -1;
+        }
+        
+        if (detectCollision(ballPosition, paddleRightPosition)) {
+            ballMovement.x *= -1;
+        }
+        
+        paddleLeftMatrix = glm::mat4(1.0f);
+        paddleLeftPosition += paddleLeftMovement * paddleSpeed * deltaTime;
+        paddleLeftMatrix = glm::translate(paddleLeftMatrix, paddleLeftPosition);
+
+        paddleRightMatrix = glm::mat4(1.0f);
+        paddleRightPosition += paddleRightMovement * paddleSpeed * deltaTime;
+        paddleRightMatrix = glm::translate(paddleRightMatrix, paddleRightPosition);
+        
+        ballMatrix = glm::mat4(1.0f);
+        ballPosition += ballMovement * paddleSpeed * deltaTime;
+        ballMatrix = glm::translate(ballMatrix, ballPosition);
+    }
     
-    playerMatrix = glm::mat4(1.0f);
-    playerPosition += playerMovement * playerSpeed * deltaTime;
-    playerMatrix = glm::translate(playerMatrix, playerPosition);
 }
 
 void render() {
-    
+
     glClear(GL_COLOR_BUFFER_BIT);
-    
-    float vertices[]  = { -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5 };
-    float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
-    
-    glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+
+    float paddleVertices[]  = { -0.3, -1.0, 0.3, -1.0, 0.3, 1.0, -0.3, -1.0, 0.3, 1.0, -0.3, 1.0 };
+    float ballVertices[]  = { -0.2, -0.2, 0.2, -0.2, 0.2, 0.2, -0.2, -0.2, 0.2, 0.2, -0.2, 0.2 };
+
+    glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, paddleVertices);
     glEnableVertexAttribArray(program.positionAttribute);
-    glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-    glEnableVertexAttribArray(program.texCoordAttribute);
-    
-    program.SetModelMatrix(playerMatrix);
-    glBindTexture(GL_TEXTURE_2D, playerTextureID);
+
+    program.SetModelMatrix(paddleLeftMatrix);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    
+
     glDisableVertexAttribArray(program.positionAttribute);
-    glDisableVertexAttribArray(program.texCoordAttribute);
     
-    float rectVertices[] = { 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5 };
-    glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, rectVertices);
+    glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, paddleVertices);
     glEnableVertexAttribArray(program.positionAttribute);
-    program.SetModelMatrix(rectMatrix);
-    glDrawArrays(GL_TRIANGLES, 0, 4);
+
+    program.SetModelMatrix(paddleRightMatrix);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
     glDisableVertexAttribArray(program.positionAttribute);
     
-    SDL_GL_SwapWindow(displayWindow);}
+    glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, ballVertices);
+    glEnableVertexAttribArray(program.positionAttribute);
+
+    program.SetModelMatrix(ballMatrix);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glDisableVertexAttribArray(program.positionAttribute);
+
+    SDL_GL_SwapWindow(displayWindow);
+
+}
+
+
 
 int main(int argc, char* argv[]) {
     init();
