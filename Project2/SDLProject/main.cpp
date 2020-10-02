@@ -187,6 +187,18 @@ void update() {
             ballMovement.y *= -1;
         }
         
+        if (paddleLeftPosition.y > 2.8) {
+            paddleLeftPosition.y = 2.8;
+        } else if (paddleLeftPosition.y < -2.8) {
+            paddleLeftPosition.y = -2.8;
+        }
+        
+        if (paddleRightPosition.y > 2.8) {
+            paddleRightPosition.y = 2.8;
+        } else if (paddleRightPosition.y < -2.8) {
+            paddleRightPosition.y = -2.8;
+        }
+        
         if (detectCollision(ballPosition, paddleLeftPosition)) {
             ballMovement.x *= -1;
         }
