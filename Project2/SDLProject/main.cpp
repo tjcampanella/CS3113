@@ -32,8 +32,8 @@ glm::vec3 ballPosition = glm::vec3(0, 0, 0);
 glm::vec3 ballMovement = glm::vec3(0, 0, 0);
 float paddleSpeed = 2.0f;
 
-int windowHeight = 480;
-int windowWidth = 640;
+int windowHeight = 960;
+int windowWidth = 1280;
 float orthoHeight = 5.0f;
 float orthoWidth = 3.75f;
 
