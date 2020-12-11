@@ -124,7 +124,7 @@ void update() {
     //slimeY += 1.0f * deltaTime;
     slimeMatrix = glm::mat4(1.0f);
     slimeRotate += -90.0f * deltaTime;
-    slimeMatrix = glm::scale(slimeMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
+    slimeMatrix = glm::scale(slimeMatrix, glm::vec3(3.0f, 3.0f, 1.0f));
     slimeMatrix = glm::translate(slimeMatrix, glm::vec3(slimeX, 0.0f, 0.0f));
     slimeMatrix = glm::rotate(slimeMatrix, glm::radians(slimeRotate), glm::vec3(0.0f, 0.0f, 1.0f));
 }

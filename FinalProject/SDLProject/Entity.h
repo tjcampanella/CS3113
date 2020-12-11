@@ -12,7 +12,7 @@
 #include "ShaderProgram.h"
 #include "Map.h"
 
-enum EntityType {PLAYER, PLATFORM, ENEMY, EGG};
+enum EntityType {PLAYER, ENEMY, EGG, ENEMYEGG};
 
 enum AIType {WALKER, JUMPER, WAITER};
 enum AIState {SEEKING, ATTACKING};
@@ -21,12 +21,15 @@ extern bool won;
 extern bool lost;
 extern int lives;
 extern bool wonLevel;
+extern bool wonLevel2; 
 extern int level; 
 extern std::vector<glm::vec3> cornTargets;
 
 class Entity {
 public:
     
+    std::vector<Entity*> enemyEggs;
+    int entityLives = 0; 
     AIType aiType;
     AIState aiState;
     EntityType entityType;
@@ -72,13 +75,19 @@ public:
     bool collidedRight = false;
     
     bool happened = false;
+    bool happened2 = false;
+    
+    bool isDead = false;
+    bool alwaysAttack = false;
+    
+    glm::vec3 randCorn; 
     
     Entity();
     
     void throwEgg();
     bool checkCollision(Entity* other);
-    void checkCollisionsY(Entity *objects, int objectCount);
-    void checkCollisionsX(Entity *objects, int objectCount);
+    void checkCollisionsY(Entity *objects, int objectCount, std::vector<Entity*> enemyEggs=std::vector<Entity*>());
+    void checkCollisionsX(Entity *objects, int objectCount, std::vector<Entity*> enemyEggs=std::vector<Entity*>());
     void update(float deltaTime, Map* map, Entity* enemies, int enemyCount, Entity* player);
     void render(ShaderProgram *program);
     void drawSpriteFromTextureAtlas(ShaderProgram *program, GLuint textureID, int index);

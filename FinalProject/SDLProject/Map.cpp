@@ -25,8 +25,6 @@ Map::Map(int width, int height, unsigned int *levelData, GLuint textureID, float
             float u = (float)(tile % tile_count_x) / (float)tile_count_x;
             float v = (float)(tile / tile_count_x) / (float)tile_count_y;
             
-            
-            
             float tileWidth = 1.0f/(float)tile_count_x;
             float tileHeight = 1.0f/(float)tile_count_y;
             
@@ -34,23 +32,28 @@ Map::Map(int width, int height, unsigned int *levelData, GLuint textureID, float
             float yoffset = (tile_size / 2); // From center of tile
             
             if (tile == 64 && tile_size * x < 8) {
-                L1Corn.insert(L1Corn.end(), {
-                    glm::vec3(xoffset + (tile_size * x), yoffset + -tile_size * y,0),
-                    glm::vec3(xoffset + (tile_size * x), yoffset + (-tile_size * y) - tile_size,0),
-                    glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + (-tile_size * y) - tile_size,0),
-                    glm::vec3(xoffset + (tile_size * x), yoffset + -tile_size * y,0),
-                    glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + (-tile_size * y) - tile_size,0),
-                    glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + -tile_size * y,0),
-                 });
+                L1Corn.emplace_back(glm::vec3(xoffset + (tile_size * x), yoffset + -tile_size * y,0));
+                L1Corn.emplace_back(glm::vec3(xoffset + (tile_size * x), yoffset + (-tile_size * y) - tile_size,0));
+                L1Corn.emplace_back(glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + (-tile_size * y) - tile_size,0));
+                L1Corn.emplace_back(glm::vec3(xoffset + (tile_size * x), yoffset + -tile_size * y,0));
+                L1Corn.emplace_back(glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + (-tile_size * y) - tile_size,0));
+                L1Corn.emplace_back( glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + -tile_size * y,0));
+                
+//                L1Corn.insert(L1Corn.end(), {
+//                    glm::vec3(xoffset + (tile_size * x), yoffset + -tile_size * y,0),
+//                    glm::vec3(xoffset + (tile_size * x), yoffset + (-tile_size * y) - tile_size,0),
+//                    glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + (-tile_size * y) - tile_size,0),
+//                    glm::vec3(xoffset + (tile_size * x), yoffset + -tile_size * y,0),
+//                    glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + (-tile_size * y) - tile_size,0),
+//                    glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + -tile_size * y,0),
+//                });
             } else if (tile == 64 && tile_size * x > 8) {
-                L2Corn.insert(L2Corn.end(), {
-                    glm::vec3(xoffset + (tile_size * x), yoffset + -tile_size * y,0),
-                    glm::vec3(xoffset + (tile_size * x), yoffset + (-tile_size * y) - tile_size,0),
-                    glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + (-tile_size * y) - tile_size,0),
-                    glm::vec3(xoffset + (tile_size * x), yoffset + -tile_size * y,0),
-                    glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + (-tile_size * y) - tile_size,0),
-                    glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + -tile_size * y,0),
-                 });
+                L2Corn.emplace_back(glm::vec3(xoffset + (tile_size * x), yoffset + -tile_size * y,0));
+                L2Corn.emplace_back(glm::vec3(xoffset + (tile_size * x), yoffset + (-tile_size * y) - tile_size,0));
+                L2Corn.emplace_back(glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + (-tile_size * y) - tile_size,0));
+                L2Corn.emplace_back(glm::vec3(xoffset + (tile_size * x), yoffset + -tile_size * y,0));
+                L2Corn.emplace_back(glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + (-tile_size * y) - tile_size,0));
+                L2Corn.emplace_back( glm::vec3(xoffset + (tile_size * x) + tile_size, yoffset + -tile_size * y,0));
             }
 
             vertices.insert(vertices.end(), {
@@ -73,6 +76,8 @@ Map::Map(int width, int height, unsigned int *levelData, GLuint textureID, float
             });
             
         }
+        
+        
         
     }
     

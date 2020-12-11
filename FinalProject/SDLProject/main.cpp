@@ -29,12 +29,11 @@ glm::mat4 viewMatrix, modelMatrix, projectionMatrix;
 GLuint fontTextureID;
 
 Scene* currentScene;
-Scene* sceneList[4];
+Scene* sceneList[2];
 
 void SwitchToScene(Scene *scene) {
     currentScene = scene;
     currentScene->Initialize(1);
-    std::cout<< "Called" << std::endl;
 }
 
 void initialize() {
@@ -88,6 +87,8 @@ void processInput() {
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_QUIT:
+                gameIsRunning = false;
+                break;
             case SDL_WINDOWEVENT_CLOSE:
                 gameIsRunning = false;
                 break;
@@ -103,9 +104,11 @@ void processInput() {
                         break;
                         
                     case SDLK_SPACE:
-                        if ((currentScene != sceneList[0]) && currentScene->state.player->currentEggsLeft != 0) {
-                            currentScene->state.player->thrown = true;
-                            Mix_PlayChannel(-1, whooshSound, 0);
+                        if ((currentScene != sceneList[0])) {
+                            if (currentScene->state.player->currentEggsLeft != 0) {
+                                currentScene->state.player->thrown = true;
+                                Mix_PlayChannel(-1, whooshSound, 0);
+                            }
                         }
                         break;
                     case SDLK_RETURN:
@@ -213,7 +216,7 @@ void render() {
             Util::DrawText(&program, fontTextureID, "You Lose", 1, -0.5f, glm::vec3(currentScene->state.player->position.x-2, -3.0f, 0));
         } else if (won) {
             Util::DrawText(&program, fontTextureID, "You Win", 1, -0.5f, glm::vec3(currentScene->state.player->position.x-2, -3.0f, 0));
-        } else if (wonLevel && currentScene->state.player->position.x < 9) {
+        } else if (wonLevel && currentScene->state.player->position.x < 9 && !wonLevel2) {
             Util::DrawText(&program, fontTextureID, "Continue ->", 1, -0.5f, glm::vec3(currentScene->state.player->position.x-2, -3.0f, 0));
         }
     }

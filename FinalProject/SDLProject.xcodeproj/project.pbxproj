@@ -16,6 +16,7 @@
 		C553D35F255A03CC002C792F /* Level.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C553D35D255A03CC002C792F /* Level.cpp */; };
 		C560C776255F35030062C2C1 /* Menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C560C774255F35030062C2C1 /* Menu.cpp */; };
 		C5A48A06257EB99A00234632 /* farm.mp3 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5A48A04257EB98600234632 /* farm.mp3 */; };
+		C5A949222582D71200583B09 /* megaChicken.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5A949212582D70D00583B09 /* megaChicken.png */; };
 		C5FFF657257AD7C300353325 /* font.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5FFF655257AD7B000353325 /* font.png */; };
 		C5FFF660257ADF0900353325 /* farmingTilesheetComplete.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5FFF65F257ADF0500353325 /* farmingTilesheetComplete.png */; };
 		DBDF1B532323DE3F007CECB1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DBDF1B522323DE3F007CECB1 /* main.cpp */; };
@@ -38,6 +39,7 @@
 				DBDF1B612323DE9E007CECB1 /* shaders in CopyFiles */,
 				C5FFF660257ADF0900353325 /* farmingTilesheetComplete.png in CopyFiles */,
 				C5A48A06257EB99A00234632 /* farm.mp3 in CopyFiles */,
+				C5A949222582D71200583B09 /* megaChicken.png in CopyFiles */,
 				C54D587D257DDCBA00184D9D /* egg.png in CopyFiles */,
 				C5FFF657257AD7C300353325 /* font.png in CopyFiles */,
 				C54D5881257DE21400184D9D /* whoosh.wav in CopyFiles */,
@@ -62,6 +64,7 @@
 		C560C774255F35030062C2C1 /* Menu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Menu.cpp; sourceTree = "<group>"; };
 		C560C775255F35030062C2C1 /* Menu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Menu.h; sourceTree = "<group>"; };
 		C5A48A04257EB98600234632 /* farm.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = farm.mp3; sourceTree = "<group>"; };
+		C5A949212582D70D00583B09 /* megaChicken.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = megaChicken.png; path = ../../../../../Downloads/megaChicken.png; sourceTree = "<group>"; };
 		C5FFF655257AD7B000353325 /* font.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font.png; sourceTree = "<group>"; };
 		C5FFF65F257ADF0500353325 /* farmingTilesheetComplete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = farmingTilesheetComplete.png; path = ../../../../../Downloads/farmingTilesheetComplete.png; sourceTree = "<group>"; };
 		DBDF1B4F2323DE3F007CECB1 /* SDLProject */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SDLProject; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -117,6 +120,7 @@
 				C5FFF655257AD7B000353325 /* font.png */,
 				C54D587C257DDC9600184D9D /* egg.png */,
 				C5A48A04257EB98600234632 /* farm.mp3 */,
+				C5A949212582D70D00583B09 /* megaChicken.png */,
 				C54D587F257DE1C700184D9D /* whoosh.wav */,
 				C5FFF65F257ADF0500353325 /* farmingTilesheetComplete.png */,
 				DBDF1B5B2323DE8D007CECB1 /* glm */,
